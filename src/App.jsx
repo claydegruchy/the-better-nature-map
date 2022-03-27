@@ -1,16 +1,32 @@
 import { useState, useEffect } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Select from 'react-select';
+import { Map, PreProcessGeodata } from './components/Map';
+import Filter from './components/Filter';
+
+import initGeodata from './components/formattedsearch.json';
 
 var defaultUiParams = {};
 
 function App() {
   const [uiOptions, setUiOptions] = useState(defaultUiParams);
 
+  // holds the geo data
+  const [geodata, setGeodata] = useState(initGeodata);
+  // holds a simple version used for filtering
+  const [filterMap, setFilterMap] = useState();
+
   useEffect(() => {
-    // Stuff to do when the UI updates
-  }, [uiOptions]);
+    var processedGeodata = PreProcessGeodata(geodata.features);
+    setFilterMap(processedGeodata.map((feature) => feature.properties));
+    setGeodata(processedGeodata);
+  }, []);
+
+  useEffect(() => {
+    console.log('update the geo data ehre');
+  }, [filterMap]);
+
+  console.log({ filterMap });
 
   const SearchableDropdown = ({ label, options, selectParams }) => {
     const set = (e) => setUiOptions({ ...uiOptions, [label]: e });
@@ -48,16 +64,13 @@ function App() {
   };
   return (
     <div className='App'>
-      <div>
-        <SearchableDropdown
-          label={'example1'}
-          selectParams={{ placeholder: 'This is a placeholder' }}
-          options={[1, 2, 3].map((b) => ({
-            value: b,
-            label: b,
-          }))}
-        />
-        <Checkbox label={'Example'} />
+      <Filter
+        dataset={filterMap}
+        setData={(e) => console.log('here we update the filter', e)}
+      />
+      <div className={'main-windows'}>
+        <div className={'control-panel'}></div>
+        <Map geodata={geodata} />
       </div>
     </div>
   );

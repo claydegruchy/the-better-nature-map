@@ -1,0 +1,58 @@
+.main-windows {
+  flex-direction: row;
+  display: inline-flex;
+  padding: 5px;
+  height: 97vh;
+  width: 97vw;
+}
+
+.leaflet-container {
+  flex: 6;
+  margin: 10px;
+  /*overflow: auto;*/
+  /* for Firefox */
+  height: 95vh;
+  border: 1px solid black;
+}
+
+@media not screen and (max-width: 768px) {
+  .App {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .control-panel {
+    width: 30vw;
+  }
+}
+.control-panel {
+  flex: 1;
+
+  /*flex-direction: column;*/
+  align-items: stretch;
+  /*overflow-y: scroll;*/
+  /*display: inline-flex;*/
+  border: 1px solid black;
+  min-height: min-content; /* needs vendor prefixes */
+}
+
+.box,
+.control-box {
+  border: 1px solid black;
+  margin: 5px;
+  padding: 5px;
+  flex: 1;
+  align-content: center;
+  /*width: 100%;*/
+  /*border-style: 'solid';*/
+  /*border: 2px solid;*/
+  border: 1px solid black;
+}
+
+.control-box {
+  /*width: 100%;*/
+  /*border-style: 'solid';*/
+  border: 1px solid black;
+}
