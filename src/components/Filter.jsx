@@ -1,48 +1,31 @@
-import React, { useState } from 'react';
-import ReactFilterBox, { SimpleResultProcessing } from 'react-filter-box';
-import 'react-filter-box/lib/react-filter-box.css';
+import { useState } from 'react';
+import QueryBuilder from 'react-querybuilder';
+import 'react-querybuilder/dist/query-builder.css';
 
- const options = [
-  {
-    columnField: 'Name',
-    type: 'number',
-  },
-  {
-    columnField: 'Description',
-    type: 'text',
-  },
-  {
-    columnField: 'Status',
-    type: 'selection', // when using type selection, it will automatically suggest all possible values
-  },
-  {
-    columnText: 'Email @',
-    columnField: 'Email',
-    type: 'text',
-  },
+const fields = [
+  { name: 'firstName', label: 'First Name' },
+  { name: 'lastName', label: 'Last Name' },
 ];
 
-function Filter({ dataset }) {
-  const [data, setData] = useState(dataset); // pass your data in here instead of empty array
+// const GetResults = query;
 
-  const onParseOk = (expressions) => {
-    console.log({expressions})
-    const newData = new SimpleResultProcessing(options).process(
-      data,
-      expressions
-    );
-    // your new data here, which is filtered out of the box by SimpleResultProcessing
-    setData(newData);
-  };
+export default ({ dataset }) => {
+  const [query, setQuery] = useState({
+    combinator: 'and',
+    rules: [
+      { field: 'firstName', operator: '=', value: 'Steve' },
+      { field: 'lastName', operator: '=', value: 'Vai' },
+    ],
+  });
 
   return (
-    <>
-      <div className='main-container' style={{width:'60vw'}}>
-        <h2>React Filter Box</h2>
-        <ReactFilterBox data={data} options={options} onParseOk={onParseOk} />
-      </div>
-    </>
+    <QueryBuilder
+      fields={fields}
+      query={query}
+      onQueryChange={(q) => {
+        console.log({ q });
+        setQuery(q);
+      }}
+    />
   );
-}
-
-export default Filter;
+};

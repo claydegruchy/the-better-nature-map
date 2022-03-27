@@ -6,27 +6,20 @@ import Filter from './components/Filter';
 
 import initGeodata from './components/formattedsearch.json';
 
-var defaultUiParams = {};
+var defaultUiParams = { minLength: 0, maxLength: 99999 };
 
 function App() {
   const [uiOptions, setUiOptions] = useState(defaultUiParams);
 
   // holds the geo data
-  const [geodata, setGeodata] = useState(initGeodata);
-  // holds a simple version used for filtering
-  const [filterMap, setFilterMap] = useState();
 
-  useEffect(() => {
-    var processedGeodata = PreProcessGeodata(geodata.features);
-    setFilterMap(processedGeodata.map((feature) => feature.properties));
-    setGeodata(processedGeodata);
-  }, []);
+  const [masterGeodata, setMasterGeodata] = useState(
+    PreProcessGeodata(initGeodata.features)
+  );
 
-  useEffect(() => {
-    console.log('update the geo data ehre');
-  }, [filterMap]);
+  useEffect(() => {}, []);
 
-  console.log({ filterMap });
+
 
   const SearchableDropdown = ({ label, options, selectParams }) => {
     const set = (e) => setUiOptions({ ...uiOptions, [label]: e });
@@ -64,13 +57,45 @@ function App() {
   };
   return (
     <div className='App'>
-      <Filter
-        dataset={filterMap}
-        setData={(e) => console.log('here we update the filter', e)}
-      />
       <div className={'main-windows'}>
-        <div className={'control-panel'}></div>
-        <Map geodata={geodata} />
+        <div className={'control-panel'}>
+          <div className='box'>
+            Min length
+            <input
+              name={'Min length'}
+              type={'number'}
+              onChange={(e) => {
+                setUiOptions({
+                  ...uiOptions,
+                  minLength: e.target.value,
+                });
+              }}
+              value={uiOptions.minLength}
+              placeholder={'Min length'}
+            />
+          </div>
+          <div className='box'>
+            max length
+            <input
+              name={'max length'}
+              type={'number'}
+              onChange={(e) => {
+                setUiOptions({
+                  ...uiOptions,
+                  maxLength: e.target.value,
+                });
+              }}
+              value={uiOptions.maxLength}
+              placeholder={'max length'}
+            />
+          </div>
+
+          {/*  <Filter
+            dataset={filterMap}
+            setData={(e) => console.log('here we update the filter', e)}
+          />*/}
+        </div>
+        <Map masterGeodata={masterGeodata} uiOptions={uiOptions} />
       </div>
     </div>
   );

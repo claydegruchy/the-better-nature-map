@@ -64,7 +64,7 @@ const FeatureTypes = {
         pathOptions={StyleSwitcher(null, 'Line', 'unhovered')}
         positions={feature.geometry.coordinates}
       >
-        <Tooltip>{properties.short_description}</Tooltip>
+        <Tooltip>{properties.kmlength} km</Tooltip>
       </Polyline>
     );
   },
@@ -80,13 +80,25 @@ const FeatureTypes = {
   },
 };
 
-function PopulateFeatures({ features, filters }) {
-  console.log({ features });
-  // do filtering
-  // var featuresToShow = features.filter(
-  //   (f) => f.properties.kmlength > 8 && f.properties.kmlength < 12
-  // );
-  var featuresToShow = features;
+function filterGeos({ uiOptions, features }) {
+  var { minLength, maxLength } = uiOptions;
+
+  var newFeatures = [];
+
+  for (var feature of features) {
+    var { properties } = feature;
+
+    if (properties.kmlength < minLength) continue;
+    if (properties.kmlength > maxLength) continue;
+
+    newFeatures.push(feature);
+  }
+
+  return newFeatures;
+}
+
+function PopulateFeatures({ features, uiOptions }) {
+  var featuresToShow = filterGeos({ features, uiOptions });
 
   var OutlineGroup = featuresToShow.filter(
     (feature) => feature?.properties?.shape?.type == 'Outline'
@@ -100,7 +112,6 @@ function PopulateFeatures({ features, filters }) {
 
   featuresToShow = [...OutlineGroup, ...LineGroup, ...MarkerGroup];
 
-  console.log({ featuresToShow });
   return (
     <>
       {featuresToShow.map((feature, i) => {
@@ -119,7 +130,9 @@ var PreProcessGeodata = (features) => {
     // get length
     var feature = turf.feature(f.geometry);
     feature.properties = f.properties;
-    feature.properties.kmlength = turf.length(feature, { units: 'kilometers' });
+    feature.properties.kmlength = turf
+      .length(feature, { units: 'kilometers' })
+      .toFixed(1);
 
     feature = turf.flip(feature);
 
@@ -127,8 +140,10 @@ var PreProcessGeodata = (features) => {
   });
 };
 
-const Map = ({ geodata }) => {
+const Map = ({ masterGeodata, uiOptions }) => {
   // we do the intial processing of the coords
+
+  const [geodata, setGeodata] = useState(masterGeodata);
 
   return (
     <MapContainer center={center} zoom={13}>
@@ -140,7 +155,7 @@ const Map = ({ geodata }) => {
         <Popup>Starting point (usually)</Popup>
       </Marker>
       <MarkerClusterGroup>
-        <PopulateFeatures features={geodata} />
+        <PopulateFeatures features={geodata} uiOptions={uiOptions} />
       </MarkerClusterGroup>
     </MapContainer>
   );
